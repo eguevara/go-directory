@@ -55,7 +55,7 @@ type ErrorResponse struct {
 	Response *http.Response
 
 	// CustomError information from directory api response.
-	CustomError
+	CustomError `json:"error"`
 }
 
 // CustomError holds directory error response.
@@ -135,7 +135,13 @@ func SetBaseURL(bu string) ClientOpt {
 // SetHTTPClient makes the directory client use the given HTTP client.
 func SetHTTPClient(client *http.Client) ClientOpt {
 	return func(c *Client) error {
+		if client == nil {
+			// for some silly reason you send a nil client
+			c.client = http.DefaultClient
+			return nil
+		}
 		c.client = client
+
 		return nil
 	}
 }
